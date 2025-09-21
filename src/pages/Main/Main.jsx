@@ -1,60 +1,20 @@
-import { useEffect, useState } from "react"
+import { useEffect} from "react"
 import styles from "./Main.module.css"
-import { getCategories, getNews } from "../../API/apiNews"
 import { NewsBanner } from "../../components/NewsBanner/NewsBanner";
 import { NewsList } from "../../components/NewsList/NewsList";
 import { Skeleton } from "../../components/Skeleton/Skeleton";
 import { Pagination } from "../../components/Pagination/Pagination";
 import { Categories } from "../../components/Categories/Categories";
+import { usePagination } from "../../Hooks/usePagination";
+import { useCategories } from "../../Hooks/useCategories";
+import { useFetch } from "../../Hooks/useFetch";
 
 export const Main = () => {
-    const [news, setNews] = useState([]);
-    const [categories, setCategories] = useState([]);
-    const [selectedCategory, setSelectedCategory] = useState("All");
-    const [isLoading, setIsLoading] = useState(true);
-    const [currentPage, setCurrentPage] = useState(1)
-    const totalPage = 10;
-    const pageSize = 10;
+    const [categories, setCategories, selectedCategory, setSelectedCategory ] = useCategories();
+    const [totalPage, pageSize, currentPage, handleNextPage, handlePageClick, handlePreviousPage] = usePagination(10, 10)
+    const [news, fetchNews, fetchCategories, isLoading] = useFetch(selectedCategory, pageSize, setCategories)
 
-    const fetchNews = async (currentPage) => {
-        try {
-            setIsLoading(true);
-            const responce = await getNews({
-                page_number: currentPage,
-                page_size: pageSize,
-                category: selectedCategory === 'All' ? null : selectedCategory
-            });
-            setNews(responce.news);
-            setIsLoading(false);
-        } catch (error) {
-            console.log(error);
-        }
-    }
 
-    const fetchCategories = async () => {
-        try {
-            const responce = await getCategories();
-            setCategories(["All", ...responce.categories])
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
-    const handleNextPage = () => {
-        if (currentPage < totalPage) {
-            setCurrentPage(currentPage + 1)
-        }
-    }
-
-    const handlePreviousPage = () => {
-        if (currentPage > 1) {
-            setCurrentPage(currentPage - 1)
-        }
-    }
-
-    const handlePageClick = (pageNumber) => {
-        setCurrentPage(pageNumber)
-    }
 
     useEffect(() => {
         fetchNews(currentPage);
