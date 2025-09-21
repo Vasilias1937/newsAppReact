@@ -1,4 +1,3 @@
-import { formatDate } from "../../helpers/formatDate"
 import styles from "./Categories.module.css"
 
 export const Categories = ({categories, setSelectedCategory, selectedCategory}) => {
